@@ -409,6 +409,14 @@
         }
       ]
     },
+    "mergeConflictAutofixBehavior": {
+      "_package": "@yarnpkg/core",
+      "type": "string",
+      "title": "Behavior that Yarn should follow when it detects merge conflicts in lockfiles.",
+      "description": "Possible behaviors are:\n\n- If `combine` (the default), Yarn will combine all lockfile variants from all commits in the merge/rebase/cherry-pick.\n- If `base`, the lockfile will be reset to the base of the merge/rebase/cherry-pick before being updated.",
+      "enum": ["combine", "base"],
+      "default": "combine"
+    },
     "networkConcurrency": {
       "_package": "@yarnpkg/core",
       "title": "Amount of HTTP requests that are allowed to run at the same time.",

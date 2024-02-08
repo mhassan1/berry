@@ -389,18 +389,39 @@ async function autofixMergeConflicts(configuration: Configuration, immutable: bo
   if (immutable)
     throw new ReportError(MessageName.AUTOMERGE_IMMUTABLE, `Cannot autofix a lockfile when running an immutable install`);
 
-  let commits = await execUtils.execvp(`git`, [`rev-parse`, `MERGE_HEAD`, `HEAD`], {
+  const mergeConflictAutofixBehavior = configuration.get(`mergeConflictAutofixBehavior`) ?? `combine`;
+  let revParseArguments: Record<`merge` | `rebase` | `cherryPick`, [string] | [string, string]>;
+
+  switch (mergeConflictAutofixBehavior) {
+    case `base`:
+      revParseArguments = {
+        merge: [`MERGE_HEAD`],
+        rebase: [`HEAD`],
+        cherryPick: [`HEAD`],
+      };
+      break;
+    default:
+    case `combine`:
+      revParseArguments = {
+        merge: [`MERGE_HEAD`, `HEAD`],
+        rebase: [`REBASE_HEAD`, `HEAD`],
+        cherryPick: [`CHERRY_PICK_HEAD`, `HEAD`],
+      };
+      break;
+  }
+
+  let commits = await execUtils.execvp(`git`, [`rev-parse`, ...revParseArguments.merge], {
     cwd: configuration.projectCwd,
   });
 
   if (commits.code !== 0) {
-    commits = await execUtils.execvp(`git`, [`rev-parse`, `REBASE_HEAD`, `HEAD`], {
+    commits = await execUtils.execvp(`git`, [`rev-parse`, ...revParseArguments.rebase], {
       cwd: configuration.projectCwd,
     });
   }
 
   if (commits.code !== 0) {
-    commits = await execUtils.execvp(`git`, [`rev-parse`, `CHERRY_PICK_HEAD`, `HEAD`], {
+    commits = await execUtils.execvp(`git`, [`rev-parse`, ...revParseArguments.cherryPick], {
       cwd: configuration.projectCwd,
     });
   }

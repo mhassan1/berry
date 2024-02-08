@@ -576,6 +576,11 @@ export const coreDefinitions: {[coreSettingName: string]: SettingsDefinition} = 
     default: [`.env.yarn?`],
     isArray: true,
   },
+  mergeConflictAutofixBehavior: {
+    description: `Enumeration defining how to handle merge conflicts in lockfiles`,
+    type: SettingsType.STRING,
+    default: `combine`,
+  },
 
   // Package patching - to fix incorrect definitions
   packageExtensions: {
@@ -693,6 +698,7 @@ export interface ConfigurationValueMap {
 
   // Miscellaneous settings
   injectEnvironmentFiles: Array<PortablePath>;
+  mergeConflictAutofixBehavior: string;
 
   // Package patching - to fix incorrect definitions
   packageExtensions: Map<string, miscUtils.ToMapValue<{
